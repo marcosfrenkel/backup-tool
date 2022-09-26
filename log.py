@@ -1,8 +1,12 @@
+"""
+Logging files taken from instrumentserver.
+"""
 
 import sys
 import logging
 
 logging.basicConfig(level=logging.DEBUG)
+
 
 def setup_logging(add_stream_handler=True, log_file=None, name='filechecker', stream_handler_level=logging.DEBUG):
 
@@ -14,7 +18,7 @@ def setup_logging(add_stream_handler=True, log_file=None, name='filechecker', st
 
     if log_file is not None:
         fmt = logging.Formatter(
-            "%(asctime)s\t:%(name)s\t:%(levelname)s\t:%(message)s",
+            "%(asctime)s:%(name)s:%(levelname)s:%(message)s",
             datefmt='%Y-%m-%d %H:%M:%S',
         )
         fh = logging.FileHandler(log_file)
@@ -35,7 +39,7 @@ def setup_logging(add_stream_handler=True, log_file=None, name='filechecker', st
     logger.info(f"Logging set up for {name}.")
 
 
-def log_logger(name='instrumentserver'):
+def log_logger(name='filechecker'):
     """Get the (root) logger for the package."""
     return logging.getLogger(name)
 
