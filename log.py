@@ -18,7 +18,7 @@ def setup_logging(add_stream_handler=True, log_file=None, name='filechecker', st
 
     if log_file is not None:
         fmt = logging.Formatter(
-            "%(asctime)s:%(name)s:%(levelname)s:%(message)s",
+            "%(asctime)s\t| %(name)s\t| %(levelname)s\t| %(message)s",
             datefmt='%Y-%m-%d %H:%M:%S',
         )
         fh = logging.FileHandler(log_file)
