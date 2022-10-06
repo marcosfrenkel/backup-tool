@@ -60,6 +60,7 @@ def test_basic_example(tmp_path):
     assert len(file_checker.target_founds) == 2
     assert len(file_checker.data_folders) == 2
     assert len(file_checker.create_data_folders) == 0
+    assert len(file_checker.skipped_folders) == 0
 
 
 def test_having_extra_folder_in_dest(tmp_path):
@@ -81,6 +82,7 @@ def test_having_extra_folder_in_dest(tmp_path):
     assert len(file_checker.target_founds) == 2
     assert len(file_checker.data_folders) == 2
     assert len(file_checker.create_data_folders) == 0
+    assert len(file_checker.skipped_folders) == 0
 
 
 def test_having_extra_folder_in_src(tmp_path):
@@ -99,6 +101,7 @@ def test_having_extra_folder_in_src(tmp_path):
     assert len(file_checker.target_founds) == 2
     assert len(file_checker.data_folders) == 2
     assert len(file_checker.create_data_folders) == 0
+    assert len(file_checker.skipped_folders) == 0
 
 
 def test_copying_new_allowed_folder(tmp_path):
@@ -125,6 +128,7 @@ def test_copying_new_allowed_folder(tmp_path):
     assert len(file_checker.target_founds) == 3
     assert len(file_checker.data_folders) == 4
     assert len(file_checker.create_data_folders) == 2
+    assert len(file_checker.skipped_folders) == 0
 
     src_data_folders = [item[0] for item in file_checker.create_data_folders]
     dest_data_folders = [item[1] for item in file_checker.create_data_folders]
@@ -132,6 +136,27 @@ def test_copying_new_allowed_folder(tmp_path):
     assert src_measurement in src_data_folders
     assert dest_simulation in dest_data_folders
     assert dest_measurement in dest_data_folders
+
+
+def test_folder_inside_measurement(tmp_path):
+    create_basic_structure(tmp_path)
+
+    src_path = tmp_path.joinpath('src')
+    dest_path = tmp_path.joinpath('dest')
+
+    src_project1 = src_path.joinpath('project1')
+    measurement = src_project1.joinpath('measurement')
+    extra_folder = measurement.joinpath('extra folder')
+    extra_folder.mkdir()
+
+    file_checker = checker.StructureChecker(src_path, dest_path)
+    assert len(file_checker.problematic_folders) == 0
+    assert len(file_checker.target_founds) == 2
+    assert len(file_checker.data_folders) == 2
+    assert len(file_checker.create_data_folders) == 0
+    assert len(file_checker.skipped_folders) == 1
+    assert file_checker.skipped_folders[0] == extra_folder
+
 
 
 

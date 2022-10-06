@@ -39,6 +39,7 @@ class StructureChecker:
         self.data_folders: List[Path] = []
         self.create_data_folders: List[Tuple[Path, Path]] = []
         self.target_founds: List[Tuple[Path, Path]] = []
+        self.skipped_folders: List[Path] = []
         logger.info(f'starting folder check')
         self.check_folders()
         logger.info(f'folder check complete')
@@ -51,6 +52,7 @@ class StructureChecker:
         self.data_folders = []
         self.target_founds = []
         self.create_data_folders = []
+        self.skipped_folders = []
 
     def convert_src_to_dest(self, path: Path) -> Path:
         """
@@ -73,26 +75,30 @@ class StructureChecker:
 
         for item in self.src.glob('**/*'):
             if item.is_dir():
+                skip = False
                 for data_folder in self.data_folders:
                     if item.is_relative_to(data_folder):
                         logger.debug(f'{item} has been skipped since its related to: {data_folder}.')
-                        continue
-                if item not in self.data_folders:
-                    if item.name in self.valid_names:
-                        self.data_folders.append(item)
-                        logger.debug(f'{item} added to data_folders.')
+                        skip = True
+                        self.skipped_folders.append(item)
+                        break
+                if not skip:
+                    if item not in self.data_folders:
+                        if item.name in self.valid_names:
+                            self.data_folders.append(item)
+                            logger.debug(f'{item} added to data_folders.')
 
-                        target_path = self.convert_src_to_dest(item)
-                        if not target_path.is_dir():
-                            self.create_data_folders.append((item, target_path))
-                            logger.debug(f'{item} is being created in dest.')
+                            target_path = self.convert_src_to_dest(item)
+                            if not target_path.is_dir():
+                                self.create_data_folders.append((item, target_path))
+                                logger.debug(f'{item} is being created in dest.')
 
-                    else:
-                        target_path = self.convert_src_to_dest(item)
-                        if target_path.is_dir():
-                            self.target_founds.append((item, target_path))
-                            logger.debug(f'for item:{item} the target: {target_path} has been found :)')
                         else:
-                            self.problematic_folders.append((item, target_path))
-                            logger.error(f'{item} has not been found in {target_path}')
+                            target_path = self.convert_src_to_dest(item)
+                            if target_path.is_dir():
+                                self.target_founds.append((item, target_path))
+                                logger.debug(f'for item:{item} the target: {target_path} has been found :)')
+                            else:
+                                self.problematic_folders.append((item, target_path))
+                                logger.error(f'{item} has not been found in {target_path}')
 
